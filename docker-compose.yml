@@ -6,6 +6,10 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
+    depends_on:
+      - app  
+     # Optional: Pass the backend URL as an environment variable
+  
     networks:
       - app-network
   app:
@@ -15,28 +19,36 @@ services:
     ports:
       - "8080:8080"
     environment:
+      SPRING_CORS_ALLOWED-ORIGINS: "*"
       SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/my_restaurant?allowPublicKeyRetrieval=TRUE&autoReconnect=TRUE&useSSL=FALSE
       SPRING_DATASOURCE_DRIVER-CLASS-NAME: com.mysql.cj.jdbc.Driver
       SPRING_DATASOURCE_PLATFORM: mysql
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: "rootpass"
+      
    
     networks:
-      - app-network
+      app-network:  # Use the same network as the react app
+        aliases:
+          - my-restaurant-app-app-1
+          - app
  
-  db:
-    image: mysql:8.0
-    container_name: mysql
-    ports:
-      - "3307:3306"
-    environment:
-      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
-      MYSQL_ROOT_HOST: "%"
-      MYSQL_DATABASE: my_restaurant
+#  db:
+#     image: mysql:8.0
+#     container_name: mysql
+#     ports:
+#     environment:
+#       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+#       MYSQL_ROOT_HOST: "%"
+#       MYSQL_DATABASE: my_restaurant
     # Bind to localhost  
    
-    networks:
-      - app-network
+#     networks:
+#       - app-network
 
 networks:
   app-network:
+    name: app-network # Explicitly set the network name 
+    driver: bridge # Use the bridge driver for local development
+    driver_opts:
+      com.docker.network.bridge.name: app-network # Specify the bridge network name

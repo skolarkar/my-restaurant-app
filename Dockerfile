@@ -1,6 +1,9 @@
 # Use an official OpenJDK runtime as a parent image
 FROM openjdk:21-jdk-slim
 
+# Install curl using apt-get
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
 # Set the working directory in the container
 WORKDIR /app
 
